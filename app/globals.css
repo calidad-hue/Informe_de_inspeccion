@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  /* Paleta corporativa MOCER (RNF-02) */
+  --color-industrial: #fcd116; /* Amarillo Industrial: headers, banners, CTAs */
+  --color-carbon: #1a1a1a; /* Negro Carbón: títulos, menús, alta jerarquía */
+  --color-slate: #4a4a4a; /* Gris Pizarra: subtítulos, texto secundario */
+  --color-neutral-light: #f4f4f4; /* Gris Claro Neutro: tarjetas, bloques */
+  --color-white: #ffffff; /* Blanco: fondo general */
+
+  --background: var(--color-white);
+  --foreground: var(--color-carbon);
+}
+
+@theme inline {
+  --color-industrial: var(--color-industrial);
+  --color-carbon: var(--color-carbon);
+  --color-slate: var(--color-slate);
+  --color-neutral-light: var(--color-neutral-light);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
