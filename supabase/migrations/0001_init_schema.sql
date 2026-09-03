@@ -130,6 +130,7 @@ create extension if not exists "pg_trgm";
 
 create index repuestos_descripcion_trgm_idx on public.repuestos using gin (descripcion gin_trgm_ops);
 create index repuestos_codigo_pn_trgm_idx on public.repuestos using gin (codigo_pn gin_trgm_ops);
+create index repuestos_created_by_idx on public.repuestos (created_by);
 
 -- ==========================================================================
 -- inspecciones — orden de trabajo (OT) técnica
@@ -161,6 +162,7 @@ create table public.inspecciones (
 
 create index inspecciones_equipo_recibido_id_idx on public.inspecciones (equipo_recibido_id);
 create index inspecciones_created_by_idx on public.inspecciones (created_by);
+create index inspecciones_approved_by_idx on public.inspecciones (approved_by);
 create index inspecciones_status_idx on public.inspecciones (status);
 
 create function public.set_inspeccion_numero_ot()
@@ -198,6 +200,7 @@ create table public.inspeccion_componentes (
 );
 
 create index inspeccion_componentes_inspeccion_id_idx on public.inspeccion_componentes (inspeccion_id);
+create index inspeccion_componentes_repuesto_id_idx on public.inspeccion_componentes (repuesto_id);
 
 -- ==========================================================================
 -- fotos_componente — evidencia fotográfica del daño por componente

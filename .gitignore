@@ -37,6 +37,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# agent skill content (regenerate with: npx skills add supabase/agent-skills)
+.agents/skills/
+.claude/skills/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
