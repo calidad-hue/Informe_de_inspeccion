@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { InspeccionDraftForm } from "@/components/inspection/InspeccionDraftForm";
 import { ComponentPicker } from "@/components/inspection/ComponentPicker";
-import { deleteComponente } from "@/lib/actions/inspecciones";
+import { deleteComponente, updateNumeroOt } from "@/lib/actions/inspecciones";
+import { InlineEditableField } from "@/components/shared/InlineEditableField";
 
 const statusLabels: Record<string, string> = {
   borrador: "Borrador",
@@ -72,7 +73,15 @@ export default async function InspeccionDetallePage({ params }: { params: Promis
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <p className="text-sm text-slate">
-            {inspeccion.numero_ot} · Nota de recibo {equipo.notas_recibo?.consecutivo}
+            {editable ? (
+              <InlineEditableField
+                value={inspeccion.numero_ot}
+                onSave={updateNumeroOt.bind(null, id)}
+              />
+            ) : (
+              inspeccion.numero_ot
+            )}{" "}
+            · Nota de recibo {equipo.notas_recibo?.consecutivo}
           </p>
           <h1 className="text-xl font-bold text-carbon">
             {equipo.descripcion} — {equipo.notas_recibo?.cliente_nombre}

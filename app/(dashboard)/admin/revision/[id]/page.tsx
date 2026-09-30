@@ -5,7 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { InspeccionDraftForm } from "@/components/inspection/InspeccionDraftForm";
 import { ComponentPicker } from "@/components/inspection/ComponentPicker";
 import { RevisionActions } from "@/components/admin/RevisionActions";
-import { deleteComponente } from "@/lib/actions/inspecciones";
+import { deleteComponente, updateNumeroOt } from "@/lib/actions/inspecciones";
+import { InlineEditableField } from "@/components/shared/InlineEditableField";
 
 const statusLabels: Record<string, string> = {
   borrador: "Borrador",
@@ -74,7 +75,8 @@ export default async function AdminRevisionDetallePage({ params }: { params: Pro
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <p className="text-sm text-slate">
-            {inspeccion.numero_ot} · Nota de recibo {equipo.notas_recibo?.consecutivo}
+            <InlineEditableField value={inspeccion.numero_ot} onSave={updateNumeroOt.bind(null, id)} />{" "}
+            · Nota de recibo {equipo.notas_recibo?.consecutivo}
           </p>
           <h1 className="text-xl font-bold text-carbon">
             {equipo.descripcion} — {equipo.notas_recibo?.cliente_nombre}

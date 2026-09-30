@@ -39,6 +39,30 @@ export async function updateInspeccionDraft(inspeccionId: string, formData: Form
   revalidatePath(`/inspecciones/${inspeccionId}`);
 }
 
+export async function updateNumeroOt(inspeccionId: string, nuevoNumeroOt: string) {
+  const supabase = await createClient();
+
+  const numeroOt = nuevoNumeroOt.trim();
+  if (!numeroOt) {
+    throw new Error("El número de OT no puede estar vacío");
+  }
+
+  const { error } = await supabase
+    .from("inspecciones")
+    .update({ numero_ot: numeroOt })
+    .eq("id", inspeccionId);
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error(`Ya existe una inspección con el número de OT "${numeroOt}"`);
+    }
+    throw new Error(error.message);
+  }
+
+  revalidatePath(`/inspecciones/${inspeccionId}`);
+  revalidatePath(`/admin/revision/${inspeccionId}`);
+}
+
 export async function addComponente(inspeccionId: string, formData: FormData) {
   const supabase = await createClient();
 

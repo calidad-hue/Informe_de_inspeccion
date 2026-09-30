@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { iniciarInspeccion } from "@/lib/actions/recepcion";
+import { iniciarInspeccion, updateNotaReciboConsecutivo } from "@/lib/actions/recepcion";
 import { formatEquipoTipo } from "@/lib/validations/recepcion.schema";
+import { InlineEditableField } from "@/components/shared/InlineEditableField";
 
 export default async function NotaReciboDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -36,7 +37,12 @@ export default async function NotaReciboDetallePage({ params }: { params: Promis
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm text-slate">{nota.consecutivo}</p>
+        <p className="text-sm text-slate">
+          <InlineEditableField
+            value={nota.consecutivo}
+            onSave={updateNotaReciboConsecutivo.bind(null, id)}
+          />
+        </p>
         <h1 className="text-xl font-bold text-carbon">{nota.cliente_nombre}</h1>
         <p className="text-sm text-slate">Recibido el {nota.fecha_recepcion}</p>
       </div>

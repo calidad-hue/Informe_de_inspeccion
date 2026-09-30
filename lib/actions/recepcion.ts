@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notaReciboSchema } from "@/lib/validations/recepcion.schema";
@@ -90,6 +91,30 @@ export async function createNotaRecibo(
   }
 
   redirect(`/recepcion/${nota.id}`);
+}
+
+export async function updateNotaReciboConsecutivo(notaId: string, nuevoConsecutivo: string) {
+  const supabase = await createClient();
+
+  const consecutivo = nuevoConsecutivo.trim();
+  if (!consecutivo) {
+    throw new Error("El consecutivo no puede estar vacío");
+  }
+
+  const { error } = await supabase
+    .from("notas_recibo")
+    .update({ consecutivo })
+    .eq("id", notaId);
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error(`Ya existe una nota de recibo con el consecutivo "${consecutivo}"`);
+    }
+    throw new Error(error.message);
+  }
+
+  revalidatePath(`/recepcion/${notaId}`);
+  revalidatePath("/recepcion");
 }
 
 export async function iniciarInspeccion(equipoRecibidoId: string) {
