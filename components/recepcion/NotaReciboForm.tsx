@@ -64,18 +64,7 @@ export function NotaReciboForm() {
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <Field label="Descripción" name={`equipos[${idx}].descripcion`} required />
-              <div>
-                <label className="block text-sm font-medium text-slate mb-1">Tipo</label>
-                <select
-                  name={`equipos[${idx}].equipo_tipo`}
-                  required
-                  className="w-full min-h-11 rounded-md border border-neutral-light bg-white px-3 text-base text-carbon focus:outline-none focus:ring-2 focus:ring-industrial"
-                >
-                  <option value="bateria">A batería</option>
-                  <option value="electrica">Eléctrica</option>
-                  <option value="neumatica">Neumática</option>
-                </select>
-              </div>
+              <TipoHerramientaField index={idx} />
               <Field label="Modelo" name={`equipos[${idx}].modelo`} />
               <Field label="Serial" name={`equipos[${idx}].serial`} />
             </div>
@@ -107,6 +96,35 @@ export function NotaReciboForm() {
         {pending ? "Guardando..." : "Registrar recepción"}
       </button>
     </form>
+  );
+}
+
+function TipoHerramientaField({ index }: { index: number }) {
+  const [tipo, setTipo] = useState("bateria");
+
+  return (
+    <div className="sm:col-span-2 grid sm:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-slate mb-1">Tipo</label>
+        <select
+          name={`equipos[${index}].equipo_tipo`}
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          required
+          className="w-full min-h-11 rounded-md border border-neutral-light bg-white px-3 text-base text-carbon focus:outline-none focus:ring-2 focus:ring-industrial"
+        >
+          <option value="bateria">A batería</option>
+          <option value="electrica">Eléctrica</option>
+          <option value="neumatica">Neumática</option>
+          <option value="hidraulica">Hidráulica</option>
+          <option value="electronica">Electrónica</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      {tipo === "otro" ? (
+        <Field label="Especifique el tipo" name={`equipos[${index}].equipo_tipo_otro`} required />
+      ) : null}
+    </div>
   );
 }
 

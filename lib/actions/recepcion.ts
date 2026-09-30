@@ -28,6 +28,7 @@ export async function createNotaRecibo(
   const equipos = Array.from({ length: equiposCount }, (_, i) => ({
     descripcion: formData.get(`equipos[${i}].descripcion`)?.toString() ?? "",
     equipo_tipo: formData.get(`equipos[${i}].equipo_tipo`)?.toString() ?? "",
+    equipo_tipo_otro: formData.get(`equipos[${i}].equipo_tipo_otro`)?.toString() || undefined,
     modelo: formData.get(`equipos[${i}].modelo`)?.toString() || undefined,
     serial: formData.get(`equipos[${i}].serial`)?.toString() || undefined,
   }));

@@ -3,12 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { iniciarInspeccion } from "@/lib/actions/recepcion";
-
-const equipoTipoLabels: Record<string, string> = {
-  bateria: "A batería",
-  electrica: "Eléctrica",
-  neumatica: "Neumática",
-};
+import { formatEquipoTipo } from "@/lib/validations/recepcion.schema";
 
 export default async function NotaReciboDetallePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,7 +17,7 @@ export default async function NotaReciboDetallePage({ params }: { params: Promis
 
   const { data: equipos } = await supabase
     .from("equipos_recibidos")
-    .select("id, descripcion, equipo_tipo, modelo, serial, fotos_recibo(id, storage_path), inspecciones(id, numero_ot, status)")
+    .select("id, descripcion, equipo_tipo, equipo_tipo_otro, modelo, serial, fotos_recibo(id, storage_path), inspecciones(id, numero_ot, status)")
     .eq("nota_recibo_id", id);
 
   const admin = createAdminClient();
@@ -65,7 +60,7 @@ export default async function NotaReciboDetallePage({ params }: { params: Promis
                 <div>
                   <p className="font-semibold text-carbon">{eq.descripcion}</p>
                   <p className="text-sm text-slate">
-                    {equipoTipoLabels[eq.equipo_tipo] ?? eq.equipo_tipo} · Modelo {eq.modelo ?? "-"} · Serial{" "}
+                    {formatEquipoTipo(eq.equipo_tipo, eq.equipo_tipo_otro)} · Modelo {eq.modelo ?? "-"} · Serial{" "}
                     {eq.serial ?? "-"}
                   </p>
                 </div>

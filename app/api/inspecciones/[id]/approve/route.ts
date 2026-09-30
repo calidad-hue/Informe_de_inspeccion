@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateAndStoreInspectionPdf } from "@/lib/pdf/generate";
 import type { InspectionReportData } from "@/lib/pdf/InspectionReportDocument";
+import { formatEquipoTipo } from "@/lib/validations/recepcion.schema";
 
 export const runtime = "nodejs";
 
@@ -33,7 +34,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       `id, numero_ot, equipo_edad, accesorios, prueba_sentido_giro, prueba_encendido, prueba_ruidos,
        causa_probable_falla, created_by,
        equipos_recibidos:equipo_recibido_id (
-         descripcion, equipo_tipo, modelo, serial,
+         descripcion, equipo_tipo, equipo_tipo_otro, modelo, serial,
          notas_recibo:nota_recibo_id ( consecutivo, fecha_recepcion, documento_remisorio, cliente_nombre )
        )`
     )
@@ -104,7 +105,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     cliente: { nombre: notaRecibo?.cliente_nombre ?? "-" },
     equipo: {
       descripcion: equipoRecibido?.descripcion ?? "-",
-      tipo: equipoRecibido?.equipo_tipo ?? "-",
+      tipo: formatEquipoTipo(equipoRecibido?.equipo_tipo, equipoRecibido?.equipo_tipo_otro),
       modelo: equipoRecibido?.modelo ?? undefined,
       serial: equipoRecibido?.serial ?? undefined,
       edad: inspeccion.equipo_edad ?? undefined,

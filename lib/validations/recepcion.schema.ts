@@ -1,13 +1,26 @@
 import { z } from "zod";
 
-export const equipoTipoValues = ["bateria", "electrica", "neumatica"] as const;
+export const equipoTipoValues = [
+  "bateria",
+  "electrica",
+  "neumatica",
+  "hidraulica",
+  "electronica",
+  "otro",
+] as const;
 
-export const equipoRecibidoSchema = z.object({
-  descripcion: z.string().min(1, "La descripción es obligatoria"),
-  equipo_tipo: z.enum(equipoTipoValues),
-  modelo: z.string().optional(),
-  serial: z.string().optional(),
-});
+export const equipoRecibidoSchema = z
+  .object({
+    descripcion: z.string().min(1, "La descripción es obligatoria"),
+    equipo_tipo: z.enum(equipoTipoValues),
+    equipo_tipo_otro: z.string().optional(),
+    modelo: z.string().optional(),
+    serial: z.string().optional(),
+  })
+  .refine((data) => data.equipo_tipo !== "otro" || !!data.equipo_tipo_otro?.trim(), {
+    message: "Debe especificar el tipo de herramienta",
+    path: ["equipo_tipo_otro"],
+  });
 
 export const notaReciboSchema = z.object({
   fecha_recepcion: z.string().min(1, "La fecha es obligatoria"),
@@ -25,3 +38,17 @@ export const notaReciboSchema = z.object({
 
 export type NotaReciboInput = z.infer<typeof notaReciboSchema>;
 export type EquipoRecibidoInput = z.infer<typeof equipoRecibidoSchema>;
+
+export const equipoTipoLabels: Record<string, string> = {
+  bateria: "A batería",
+  electrica: "Eléctrica",
+  neumatica: "Neumática",
+  hidraulica: "Hidráulica",
+  electronica: "Electrónica",
+  otro: "Otro",
+};
+
+export function formatEquipoTipo(tipo: string | null | undefined, otro?: string | null): string {
+  if (tipo === "otro" && otro?.trim()) return otro.trim();
+  return (tipo && equipoTipoLabels[tipo]) || tipo || "-";
+}
