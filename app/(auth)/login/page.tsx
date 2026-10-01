@@ -24,6 +24,10 @@ export default function LoginPage() {
               id="email"
               name="email"
               type="email"
+              autoComplete="email"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
               required
               className="w-full min-h-11 rounded-md border border-neutral-light bg-white px-3 text-base text-carbon focus:outline-none focus:ring-2 focus:ring-industrial"
             />
@@ -36,6 +40,7 @@ export default function LoginPage() {
               id="password"
               name="password"
               type="password"
+              autoComplete="current-password"
               required
               className="w-full min-h-11 rounded-md border border-neutral-light bg-white px-3 text-base text-carbon focus:outline-none focus:ring-2 focus:ring-industrial"
             />

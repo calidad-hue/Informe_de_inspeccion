@@ -10,7 +10,7 @@ export interface LoginFormState {
 export async function login(_prevState: LoginFormState, formData: FormData): Promise<LoginFormState> {
   const supabase = await createClient();
 
-  const email = formData.get("email")?.toString() ?? "";
+  const email = formData.get("email")?.toString().trim() ?? "";
   const password = formData.get("password")?.toString() ?? "";
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });
