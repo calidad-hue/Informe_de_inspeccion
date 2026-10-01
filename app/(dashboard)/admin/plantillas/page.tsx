@@ -1,11 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { updateCompanyHeader, updateGarantiaRecomendaciones } from "@/lib/actions/plantillas";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { updateCompanyHeader, updateGarantiaRecomendaciones, uploadCompanyLogo } from "@/lib/actions/plantillas";
 
 interface CompanyHeader {
   nombre: string;
   nit?: string;
   direccion?: string;
   telefono?: string;
+  logo_url?: string;
 }
 
 interface GarantiaRecomendaciones {
@@ -27,9 +29,41 @@ export default async function PlantillasPage() {
     recomendaciones: [],
   }) as GarantiaRecomendaciones;
 
+  let logoPreviewUrl: string | null = null;
+  if (companyHeader.logo_url) {
+    const admin = createAdminClient();
+    const { data } = await admin.storage.from("company-assets").createSignedUrl(companyHeader.logo_url, 300);
+    logoPreviewUrl = data?.signedUrl ?? null;
+  }
+
   return (
     <div className="max-w-2xl space-y-6">
       <h1 className="text-xl font-bold text-carbon">Plantillas del informe</h1>
+
+      <section className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+        <h2 className="font-bold text-carbon">Logo de la empresa</h2>
+        {logoPreviewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoPreviewUrl} alt="Logo actual" className="h-20 object-contain" />
+        ) : (
+          <p className="text-sm text-slate">Aún no se ha cargado un logo. Se usará solo el nombre en el informe.</p>
+        )}
+        <form action={uploadCompanyLogo} className="flex items-center gap-3">
+          <input
+            type="file"
+            name="logo"
+            accept="image/png,image/jpeg,image/webp,image/svg+xml"
+            required
+            className="text-sm text-carbon file:mr-3 file:rounded-md file:border-0 file:bg-neutral-light file:px-3 file:py-2"
+          />
+          <button
+            type="submit"
+            className="min-h-11 rounded-md bg-industrial text-carbon font-semibold px-4 text-sm hover:brightness-95"
+          >
+            Subir logo
+          </button>
+        </form>
+      </section>
 
       <form action={updateCompanyHeader} className="bg-white rounded-lg shadow-sm p-6 space-y-4">
         <h2 className="font-bold text-carbon">Encabezado de empresa</h2>

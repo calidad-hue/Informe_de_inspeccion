@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 
 const COLOR_CARBON = "#1A1A1A";
 const COLOR_SLATE = "#4A4A4A";
@@ -13,8 +13,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
-  headerTitle: { fontSize: 16, fontWeight: 700, color: COLOR_CARBON },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  headerLogo: { width: 40, height: 40, objectFit: "contain" },
+  headerTitle: { fontSize: 15, fontWeight: 700, color: COLOR_CARBON },
+  headerContact: { fontSize: 8, color: COLOR_CARBON },
   headerMeta: { fontSize: 9, color: COLOR_CARBON, textAlign: "right" },
   sectionTitle: {
     fontSize: 12,
@@ -41,28 +45,40 @@ const styles = StyleSheet.create({
   colDesc: { width: "42%" },
   colPn: { width: "20%" },
   colQty: { width: "15%" },
-  colSection: { width: "15%" },
   listItem: { fontSize: 10, marginBottom: 3, flexDirection: "row" },
   listBullet: { width: 14 },
   footer: { marginTop: 24, borderTopWidth: 1, borderTopColor: "#DDDDDD", paddingTop: 8 },
+  photoRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 4, marginBottom: 6 },
+  photoThumb: { width: 90, height: 90, objectFit: "cover", borderRadius: 2 },
+  hallazgoBlock: { marginBottom: 8 },
 });
 
+interface Foto {
+  url: string;
+}
+
 export interface InspectionReportData {
-  companyHeader: { nombre: string; nit?: string; direccion?: string; telefono?: string };
+  companyHeader: { nombre: string; nit?: string; direccion?: string; telefono?: string; logoUrl?: string };
   fechaInforme: string;
   notaRecibo: {
     consecutivo: string;
     fechaRecepcion: string;
     documentoRemisorio?: string;
   };
-  cliente: { nombre: string; representante?: string };
+  cliente: { nombre: string };
   equipo: { descripcion: string; tipo: string; modelo?: string; serial?: string; edad?: string };
   numeroOt: string;
+  recepcion: {
+    observaciones?: string;
+    fotos: Foto[];
+  };
   hallazgos: Array<{
     seccion: string;
     descripcion: string;
+    codigoPn?: string;
     diagnostico?: string;
-    solucion?: string;
+    recomendacion?: string;
+    fotos: Foto[];
   }>;
   pruebaFuncionamiento: {
     sentidoGiro?: string;
@@ -73,7 +89,7 @@ export interface InspectionReportData {
   repuestos: Array<{
     numero: number;
     descripcion: string;
-    codigoPn: string;
+    codigoPn?: string;
     cantidad: number;
   }>;
   consideracionesGenerales?: string;
@@ -82,11 +98,34 @@ export interface InspectionReportData {
 }
 
 export function InspectionReportDocument({ data }: { data: InspectionReportData }) {
+  const contactoPartes = [data.companyHeader.nit && `NIT ${data.companyHeader.nit}`, data.companyHeader.direccion, data.companyHeader.telefono].filter(
+    Boolean
+  );
+
+  const pruebaPartes: string[] = [];
+  if (data.pruebaFuncionamiento.sentidoGiro) pruebaPartes.push(`Sentido de giro: ${data.pruebaFuncionamiento.sentidoGiro}`);
+  if (data.pruebaFuncionamiento.encendido !== undefined) {
+    pruebaPartes.push(`Encendido: ${data.pruebaFuncionamiento.encendido ? "Sí" : "No"}`);
+  }
+  if (data.pruebaFuncionamiento.ruidos) pruebaPartes.push(`Ruidos: ${data.pruebaFuncionamiento.ruidos}`);
+
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.headerBand}>
-          <Text style={styles.headerTitle}>{data.companyHeader.nombre} — Informe de Inspección</Text>
+          <View style={styles.headerLeft}>
+            {data.companyHeader.logoUrl ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={data.companyHeader.logoUrl} style={styles.headerLogo} />
+            ) : null}
+            <View>
+              <Text style={styles.headerTitle}>{data.companyHeader.nombre}</Text>
+              <Text style={styles.headerTitle}>Informe de Inspección</Text>
+              {contactoPartes.length > 0 ? (
+                <Text style={styles.headerContact}>{contactoPartes.join(" · ")}</Text>
+              ) : null}
+            </View>
+          </View>
           <View>
             <Text style={styles.headerMeta}>OT: {data.numeroOt}</Text>
             <Text style={styles.headerMeta}>Nota de recibo: {data.notaRecibo.consecutivo}</Text>
@@ -95,52 +134,60 @@ export function InspectionReportDocument({ data }: { data: InspectionReportData 
         </View>
 
         <View style={styles.infoGrid}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Cliente</Text>
-            <Text style={styles.infoValue}>{data.cliente.nombre}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Representante</Text>
-            <Text style={styles.infoValue}>{data.cliente.representante ?? "-"}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Herramienta</Text>
-            <Text style={styles.infoValue}>{data.equipo.descripcion} ({data.equipo.tipo})</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Modelo / Serial</Text>
-            <Text style={styles.infoValue}>{data.equipo.modelo ?? "-"} / {data.equipo.serial ?? "-"}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Edad del equipo</Text>
-            <Text style={styles.infoValue}>{data.equipo.edad ?? "-"}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Documento remisorio</Text>
-            <Text style={styles.infoValue}>{data.notaRecibo.documentoRemisorio ?? "-"}</Text>
-          </View>
+          <InfoItem label="Cliente" value={data.cliente.nombre} />
+          <InfoItem label="Herramienta" value={`${data.equipo.descripcion} (${data.equipo.tipo})`} />
+          {data.equipo.modelo || data.equipo.serial ? (
+            <InfoItem
+              label="Modelo / Serial"
+              value={[data.equipo.modelo, data.equipo.serial].filter(Boolean).join(" / ")}
+            />
+          ) : null}
+          {data.equipo.edad ? <InfoItem label="Edad del equipo" value={data.equipo.edad} /> : null}
         </View>
 
-        <Text style={styles.sectionTitle}>Diagnóstico</Text>
-        {groupBySeccion(data.hallazgos).map(([seccion, items]) => (
-          <View key={seccion}>
-            <Text style={styles.subheading}>{seccion}</Text>
-            {items.map((h, idx) => (
-              <Text key={idx} style={styles.paragraph}>
-                {h.descripcion}
-                {h.diagnostico ? ` — ${h.diagnostico}` : ""}
-                {h.solucion ? ` (Solución: ${h.solucion})` : ""}
-              </Text>
-            ))}
-          </View>
-        ))}
+        {data.notaRecibo.documentoRemisorio || data.recepcion.observaciones || data.recepcion.fotos.length > 0 ? (
+          <>
+            <Text style={styles.sectionTitle}>Recepción del Equipo</Text>
+            {data.notaRecibo.documentoRemisorio ? (
+              <Text style={styles.paragraph}>Documento remisorio: {data.notaRecibo.documentoRemisorio}</Text>
+            ) : null}
+            {data.recepcion.observaciones ? (
+              <Text style={styles.paragraph}>{data.recepcion.observaciones}</Text>
+            ) : null}
+            <PhotoRow fotos={data.recepcion.fotos} />
+          </>
+        ) : null}
 
-        <Text style={styles.sectionTitle}>Prueba de Funcionamiento</Text>
-        <Text style={styles.paragraph}>
-          Sentido de giro: {data.pruebaFuncionamiento.sentidoGiro ?? "-"} | Encendido:{" "}
-          {data.pruebaFuncionamiento.encendido ? "Sí" : "No"} | Ruidos:{" "}
-          {data.pruebaFuncionamiento.ruidos ?? "Ninguno reportado"}
-        </Text>
+        {pruebaPartes.length > 0 ? (
+          <>
+            <Text style={styles.sectionTitle}>Prueba de Funcionamiento</Text>
+            <Text style={styles.paragraph}>{pruebaPartes.join(" | ")}</Text>
+          </>
+        ) : null}
+
+        {data.hallazgos.length > 0 ? (
+          <>
+            <Text style={styles.sectionTitle}>Diagnóstico</Text>
+            {groupBySeccion(data.hallazgos).map(([seccion, items]) => (
+              <View key={seccion}>
+                <Text style={styles.subheading}>{seccion}</Text>
+                {items.map((h, idx) => (
+                  <View key={idx} style={styles.hallazgoBlock}>
+                    <Text style={styles.paragraph}>
+                      {h.codigoPn ? `${h.codigoPn} — ` : ""}
+                      {h.descripcion}
+                      {h.diagnostico ? `: ${h.diagnostico}` : ""}
+                    </Text>
+                    {h.recomendacion ? (
+                      <Text style={styles.paragraph}>Recomendación: {h.recomendacion}</Text>
+                    ) : null}
+                    <PhotoRow fotos={h.fotos} />
+                  </View>
+                ))}
+              </View>
+            ))}
+          </>
+        ) : null}
 
         {data.causaProbableFalla ? (
           <>
@@ -149,23 +196,27 @@ export function InspectionReportDocument({ data }: { data: InspectionReportData 
           </>
         ) : null}
 
-        <Text style={styles.sectionTitle}>Listado de Repuestos</Text>
-        <View style={styles.table}>
-          <View style={styles.tableHeaderRow}>
-            <Text style={[styles.th, styles.colNo]}>N°</Text>
-            <Text style={[styles.th, styles.colDesc]}>Descripción</Text>
-            <Text style={[styles.th, styles.colPn]}>P/N</Text>
-            <Text style={[styles.th, styles.colQty]}>Cantidad</Text>
-          </View>
-          {data.repuestos.map((r) => (
-            <View key={r.numero} style={styles.tableRow}>
-              <Text style={[styles.td, styles.colNo]}>{r.numero}</Text>
-              <Text style={[styles.td, styles.colDesc]}>{r.descripcion}</Text>
-              <Text style={[styles.td, styles.colPn]}>{r.codigoPn}</Text>
-              <Text style={[styles.td, styles.colQty]}>{r.cantidad}</Text>
+        {data.repuestos.length > 0 ? (
+          <>
+            <Text style={styles.sectionTitle}>Listado de Repuestos</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeaderRow}>
+                <Text style={[styles.th, styles.colNo]}>N°</Text>
+                <Text style={[styles.th, styles.colDesc]}>Descripción</Text>
+                <Text style={[styles.th, styles.colPn]}>P/N</Text>
+                <Text style={[styles.th, styles.colQty]}>Cantidad</Text>
+              </View>
+              {data.repuestos.map((r) => (
+                <View key={r.numero} style={styles.tableRow}>
+                  <Text style={[styles.td, styles.colNo]}>{r.numero}</Text>
+                  <Text style={[styles.td, styles.colDesc]}>{r.descripcion}</Text>
+                  <Text style={[styles.td, styles.colPn]}>{r.codigoPn ?? ""}</Text>
+                  <Text style={[styles.td, styles.colQty]}>{r.cantidad}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
+          </>
+        ) : null}
 
         {data.consideracionesGenerales ? (
           <>
@@ -191,6 +242,27 @@ export function InspectionReportDocument({ data }: { data: InspectionReportData 
         </View>
       </Page>
     </Document>
+  );
+}
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.infoItem}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
+    </View>
+  );
+}
+
+function PhotoRow({ fotos }: { fotos: Foto[] }) {
+  if (fotos.length === 0) return null;
+  return (
+    <View style={styles.photoRow}>
+      {fotos.map((f, idx) => (
+        // eslint-disable-next-line jsx-a11y/alt-text
+        <Image key={idx} src={f.url} style={styles.photoThumb} />
+      ))}
+    </View>
   );
 }
 

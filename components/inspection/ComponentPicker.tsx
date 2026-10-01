@@ -137,7 +137,7 @@ export function ComponentPicker({ inspeccionId, defaultSeccion }: { inspeccionId
         disabled={!manual && !selected}
       />
       <TextArea
-        label="Solución"
+        label="Recomendación / Comentario"
         name="solucion"
         defaultValue={selected?.solucion_estandar ?? ""}
         disabled={!manual && !selected}

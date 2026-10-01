@@ -130,7 +130,7 @@ export default async function AdminRevisionDetallePage({ params }: { params: Pro
                       {c.descripcion} {c.cantidad > 1 ? `(x${c.cantidad})` : ""}
                     </p>
                     {c.diagnostico ? <p className="text-sm text-slate">Diagnóstico: {c.diagnostico}</p> : null}
-                    {c.solucion ? <p className="text-sm text-slate">Solución: {c.solucion}</p> : null}
+                    {c.solucion ? <p className="text-sm text-slate">Recomendación: {c.solucion}</p> : null}
                   </div>
                   {editable ? (
                     <form action={deleteComponente.bind(null, id, c.id)}>
