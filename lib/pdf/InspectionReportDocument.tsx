@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
-  headerLogo: { width: 40, height: 40, objectFit: "contain" },
+  headerLogo: { width: 110, height: 38, objectFit: "contain" },
   headerTitle: { fontSize: 15, fontWeight: 700, color: COLOR_CARBON },
   headerContact: { fontSize: 8, color: COLOR_CARBON },
   headerMeta: { fontSize: 9, color: COLOR_CARBON, textAlign: "right" },
