@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { InspeccionDraftForm } from "@/components/inspection/InspeccionDraftForm";
 import { ComponentPicker } from "@/components/inspection/ComponentPicker";
+import { InspeccionActions } from "@/components/inspection/InspeccionActions";
 import { RevisionActions } from "@/components/admin/RevisionActions";
 import { deleteComponente, updateNumeroOt } from "@/lib/actions/inspecciones";
 import { InlineEditableField } from "@/components/shared/InlineEditableField";
@@ -102,7 +103,6 @@ export default async function AdminRevisionDetallePage({ params }: { params: Pro
       <InspeccionDraftForm
         id={id}
         editable={editable}
-        showSubmitForReview={false}
         values={{
           equipo_edad: inspeccion.equipo_edad,
           accesorios: inspeccion.accesorios,
@@ -155,6 +155,8 @@ export default async function AdminRevisionDetallePage({ params }: { params: Pro
 
         {editable ? <ComponentPicker inspeccionId={id} /> : null}
       </section>
+
+      {editable ? <InspeccionActions id={id} showSubmitForReview={false} /> : null}
 
       {inspeccion.status === "en_revision" ? <RevisionActions inspeccionId={id} /> : null}
     </div>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { updateInspeccionDraft, submitInspeccion } from "@/lib/actions/inspecciones";
+export function inspeccionDraftFormId(inspeccionId: string) {
+  return `inspeccion-draft-${inspeccionId}`;
+}
 
 export interface InspeccionDraftValues {
   equipo_edad: string | null;
@@ -18,21 +19,11 @@ export function InspeccionDraftForm({
   id,
   values,
   editable,
-  showSubmitForReview = true,
 }: {
   id: string;
   values: InspeccionDraftValues;
   editable: boolean;
-  showSubmitForReview?: boolean;
 }) {
-  const [pending, startTransition] = useTransition();
-
-  function handleSave(formData: FormData) {
-    startTransition(async () => {
-      await updateInspeccionDraft(id, formData);
-    });
-  }
-
   return (
     <div className="space-y-4">
       {values.status === "rechazado" && values.rejected_reason ? (
@@ -42,7 +33,11 @@ export function InspeccionDraftForm({
         </div>
       ) : null}
 
-      <form action={handleSave} className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+      <form
+        id={inspeccionDraftFormId(id)}
+        onSubmit={(e) => e.preventDefault()}
+        className="bg-white rounded-lg shadow-sm p-6 space-y-4"
+      >
         <h2 className="font-bold text-carbon">Recepción y prueba de funcionamiento</h2>
         <div className="grid sm:grid-cols-2 gap-4">
           <Field label="Edad del equipo" name="equipo_edad" defaultValue={values.equipo_edad ?? ""} disabled={!editable} />
@@ -75,32 +70,7 @@ export function InspeccionDraftForm({
           defaultValue={values.causa_probable_falla ?? ""}
           disabled={!editable}
         />
-
-        {editable ? (
-          <button
-            type="submit"
-            disabled={pending}
-            className="min-h-11 rounded-md bg-carbon text-white px-4 text-sm font-semibold hover:bg-carbon/90 disabled:opacity-50"
-          >
-            {pending ? "Guardando..." : "Guardar borrador"}
-          </button>
-        ) : null}
       </form>
-
-      {editable && showSubmitForReview ? (
-        <form
-          action={async () => {
-            await submitInspeccion(id);
-          }}
-        >
-          <button
-            type="submit"
-            className="w-full sm:w-auto min-h-11 px-6 rounded-md bg-industrial text-carbon font-semibold hover:brightness-95"
-          >
-            Enviar a revisión
-          </button>
-        </form>
-      ) : null}
     </div>
   );
 }

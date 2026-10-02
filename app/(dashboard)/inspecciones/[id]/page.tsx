@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { InspeccionDraftForm } from "@/components/inspection/InspeccionDraftForm";
 import { ComponentPicker } from "@/components/inspection/ComponentPicker";
+import { InspeccionActions } from "@/components/inspection/InspeccionActions";
 import { deleteComponente, updateNumeroOt } from "@/lib/actions/inspecciones";
 import { InlineEditableField } from "@/components/shared/InlineEditableField";
 
@@ -150,6 +151,8 @@ export default async function InspeccionDetallePage({ params }: { params: Promis
 
         {editable ? <ComponentPicker inspeccionId={id} /> : null}
       </section>
+
+      {editable ? <InspeccionActions id={id} /> : null}
     </div>
   );
 }

@@ -11,14 +11,17 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR_INDUSTRIAL,
     padding: 12,
     marginBottom: 16,
+  },
+  headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10, flexGrow: 1, flexShrink: 1 },
   headerLogo: { width: 110, height: 38, objectFit: "contain" },
   headerTitle: { fontSize: 15, fontWeight: 700, color: COLOR_CARBON },
-  headerContact: { fontSize: 8, color: COLOR_CARBON },
+  headerContact: { fontSize: 8, color: COLOR_CARBON, marginTop: 8 },
+  headerMetaBlock: { width: 150, flexShrink: 0 },
   headerMeta: { fontSize: 9, color: COLOR_CARBON, textAlign: "right" },
   sectionTitle: {
     fontSize: 12,
@@ -113,24 +116,26 @@ export function InspectionReportDocument({ data }: { data: InspectionReportData 
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.headerBand}>
-          <View style={styles.headerLeft}>
-            {data.companyHeader.logoUrl ? (
-              // eslint-disable-next-line jsx-a11y/alt-text
-              <Image src={data.companyHeader.logoUrl} style={styles.headerLogo} />
-            ) : null}
-            <View>
-              <Text style={styles.headerTitle}>{data.companyHeader.nombre}</Text>
-              <Text style={styles.headerTitle}>Informe de Inspección</Text>
-              {contactoPartes.length > 0 ? (
-                <Text style={styles.headerContact}>{contactoPartes.join(" · ")}</Text>
+          <View style={styles.headerTop}>
+            <View style={styles.headerLeft}>
+              {data.companyHeader.logoUrl ? (
+                // eslint-disable-next-line jsx-a11y/alt-text
+                <Image src={data.companyHeader.logoUrl} style={styles.headerLogo} />
               ) : null}
+              <View>
+                <Text style={styles.headerTitle}>{data.companyHeader.nombre}</Text>
+                <Text style={styles.headerTitle}>Informe de Inspección</Text>
+              </View>
+            </View>
+            <View style={styles.headerMetaBlock}>
+              <Text style={styles.headerMeta}>OT: {data.numeroOt}</Text>
+              <Text style={styles.headerMeta}>Nota de recibo: {data.notaRecibo.consecutivo}</Text>
+              <Text style={styles.headerMeta}>Fecha: {data.fechaInforme}</Text>
             </View>
           </View>
-          <View>
-            <Text style={styles.headerMeta}>OT: {data.numeroOt}</Text>
-            <Text style={styles.headerMeta}>Nota de recibo: {data.notaRecibo.consecutivo}</Text>
-            <Text style={styles.headerMeta}>Fecha: {data.fechaInforme}</Text>
-          </View>
+          {contactoPartes.length > 0 ? (
+            <Text style={styles.headerContact}>{contactoPartes.join(" · ")}</Text>
+          ) : null}
         </View>
 
         <View style={styles.infoGrid}>
